@@ -15,5 +15,6 @@ class DatabaseSeeder extends Seeder
         // Chamar o seeder de usuário admin
         $this->call(AdminUserSeeder::class);
         $this->call(ClienteSeeder::class);  // ← ADICIONAR ESTA LINHA
+        $this->call(ProdutoSeeder::class);  // ← ADICIONAR ESTA LINHA
     }
 }

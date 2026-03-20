@@ -15,4 +15,10 @@ class Cliente extends Model
         'email',
         'observacao',
     ];
+
+    // Relacionamento: um cliente pode ter muitas vendas
+    public function vendas()
+    {
+        return $this->hasMany(Venda::class);    
+    }
 }
