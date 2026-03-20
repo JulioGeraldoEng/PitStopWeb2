@@ -17,5 +17,6 @@ class DatabaseSeeder extends Seeder
         $this->call(ClienteSeeder::class);  // ← ADICIONAR ESTA LINHA
         $this->call(ProdutoSeeder::class);  // ← ADICIONAR ESTA LINHA
         $this->call(VendaSeeder::class);  // ← ADICIONAR ESTA LINHA
+        $this->call(ItemVendaSeeder::class);  // ← ADICIONAR ESTA LINHA
     }
 }

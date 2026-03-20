@@ -26,7 +26,7 @@ class Venda extends Model
     // Relacionamento: uma venda tem muitos itens
     public function itens()
     {
-        return $this->hasMany(ItemVenda::class);
+        return $this->hasMany(ItemVenda::class, 'venda_id');
     }
 
     // Relacionamento: uma venda tem um recebimento
