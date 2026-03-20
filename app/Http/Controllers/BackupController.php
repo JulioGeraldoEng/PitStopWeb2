@@ -196,4 +196,59 @@ class BackupController extends Controller
         }
         return round($bytes, 2) . ' ' . $units[$i];
     }
+
+        // Importar backup via upload
+    public function import(Request $request)
+    {
+        try {
+            $request->validate([
+                'arquivo' => 'required|file|mimes:sqlite,sqlite3,db|max:10240',
+            ]);
+            
+            $arquivo = $request->file('arquivo');
+            $nomeImportado = 'importado_' . date('Ymd_His') . '.sqlite';
+            
+            $backupDir = storage_path('app/backups');
+            if (!file_exists($backupDir)) {
+                mkdir($backupDir, 0777, true);
+            }
+            
+            $arquivo->move($backupDir, $nomeImportado);
+            
+            return redirect()->route('backups.index')
+                ->with('success', 'Arquivo importado com sucesso!')
+                ->with('importado', $nomeImportado);
+                
+        } catch (\Exception $e) {
+            return redirect()->route('backups.index')
+                ->with('error', 'Erro ao importar: ' . $e->getMessage());
+        }
+    }
+
+    // Restaurar após importar
+    public function restaurarImportado(Request $request)
+    {
+        try {
+            $filename = $request->filename;
+            $backupPath = storage_path('app/backups/' . $filename);
+            $bancoPath = database_path('pitstopweb.sqlite');
+            
+            if (!file_exists($backupPath)) {
+                return redirect()->route('backups.index')
+                    ->with('error', 'Arquivo não encontrado!');
+            }
+            
+            $this->criarBackup('auto_pre_restore_' . date('Ymd_His'));
+            
+            copy($backupPath, $bancoPath);
+            chmod($bancoPath, 0666);
+            
+            return redirect()->route('backups.index')
+                ->with('success', 'Backup restaurado com sucesso!');
+                
+        } catch (\Exception $e) {
+            return redirect()->route('backups.index')
+                ->with('error', 'Erro ao restaurar: ' . $e->getMessage());
+        }
+    }
 }
