@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\ProdutoController;
 use App\Http\Controllers\VendaController;
 use App\Http\Controllers\ItemVendaController;
+use App\Http\Controllers\RelatorioController;
 
 // Rotas públicas
 Route::get('/', function () {
@@ -48,4 +49,12 @@ Route::middleware('auth')->group(function () {
         ->name('item-venda.edit');
     Route::put('item-venda/{id}', [ItemVendaController::class, 'update'])
         ->name('item-venda.update');
+
+    // Rotas de Relatórios
+    Route::prefix('relatorios')->name('relatorios.')->group(function () {
+        Route::get('/', [RelatorioController::class, 'index'])->name('index');
+        Route::post('/vendas-periodo', [RelatorioController::class, 'vendasPorPeriodo'])->name('vendas.periodo');
+        Route::post('/produtos-ranking', [RelatorioController::class, 'produtosMaisVendidos'])->name('produtos.ranking');
+        Route::get('/faturamento-mensal', [RelatorioController::class, 'faturamentoMensal'])->name('faturamento.mensal');
+    });
 });

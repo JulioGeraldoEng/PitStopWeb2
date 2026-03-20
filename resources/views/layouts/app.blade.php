@@ -33,6 +33,9 @@
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ route('vendas.index') }}">💰 Vendas</a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('relatorios.index') }}">📊 Relatórios</a>
+                            </li>
                         @endif
                         <li class="nav-item">
                             <span class="nav-link">Olá, {{ Auth::user()->name }}</span>
