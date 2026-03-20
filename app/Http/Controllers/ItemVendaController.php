@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ItemVenda;
 use App\Models\Venda;
+use App\Models\Produto;
 use Illuminate\Http\Request;
 
 class ItemVendaController extends Controller
@@ -31,43 +32,67 @@ class ItemVendaController extends Controller
             ->with('success', 'Item removido com sucesso!');
     }
     
-    // Adicionar um novo item a uma venda existente (opcional)
-    public function store(Request $request)
+    // Mostrar formulário de edição do item
+    public function edit($id)
+    {
+        $item = ItemVenda::findOrFail($id);
+        $produtos = Produto::orderBy('nome')->get();
+        return view('vendas.item-edit', compact('item', 'produtos'));
+    }
+    
+    // Atualizar o item da venda
+    public function update(Request $request, $id)
     {
         $request->validate([
-            'venda_id' => 'required|exists:vendas,id',
             'produto_id' => 'required|exists:produtos,id',
             'quantidade' => 'required|integer|min:1',
         ]);
         
-        $venda = Venda::findOrFail($request->venda_id);
-        $produto = \App\Models\Produto::findOrFail($request->produto_id);
+        $item = ItemVenda::findOrFail($id);
+        $venda = Venda::findOrFail($item->venda_id);
         
-        // Verificar estoque
-        if ($produto->estoque < $request->quantidade) {
-            return back()->with('error', 'Estoque insuficiente!');
+        // Verificar se a venda já está paga ou cancelada
+        if ($venda->status != 'pendente') {
+            return back()->with('error', 'Não é possível editar uma venda já paga ou cancelada.');
         }
         
-        $subtotal = $produto->preco * $request->quantidade;
+        // Restaurar estoque do produto antigo
+        $produtoAntigo = $item->produto;
+        if ($produtoAntigo) {
+            $produtoAntigo->increment('estoque', $item->quantidade);
+        }
         
-        // Criar item
-        $item = ItemVenda::create([
-            'venda_id' => $request->venda_id,
-            'produto_id' => $produto->id,
-            'nome_produto' => $produto->nome,
+        // Obter novo produto
+        $novoProduto = Produto::findOrFail($request->produto_id);
+        
+        // Verificar estoque do novo produto
+        if ($novoProduto->estoque < $request->quantidade) {
+            // Se não tiver estoque, restaurar o estoque que foi removido
+            if ($produtoAntigo) {
+                $produtoAntigo->decrement('estoque', $item->quantidade);
+            }
+            return back()->with('error', 'Estoque insuficiente para o novo produto!');
+        }
+        
+        // Atualizar o item
+        $novoSubtotal = $novoProduto->preco * $request->quantidade;
+        
+        $item->update([
+            'produto_id' => $novoProduto->id,
+            'nome_produto' => $novoProduto->nome,
             'quantidade' => $request->quantidade,
-            'preco_unitario' => $produto->preco,
-            'subtotal' => $subtotal,
+            'preco_unitario' => $novoProduto->preco,
+            'subtotal' => $novoSubtotal,
         ]);
         
-        // Atualizar estoque
-        $produto->decrement('estoque', $request->quantidade);
+        // Atualizar estoque do novo produto
+        $novoProduto->decrement('estoque', $request->quantidade);
         
-        // Atualizar total da venda
-        $novoTotal = $venda->itens()->sum('subtotal') + $subtotal;
+        // Recalcular total da venda
+        $novoTotal = $venda->itens()->sum('subtotal');
         $venda->update(['total' => $novoTotal]);
         
-        return redirect()->route('vendas.show', $request->venda_id)
-            ->with('success', 'Item adicionado com sucesso!');
+        return redirect()->route('vendas.show', $item->venda_id)
+            ->with('success', 'Item atualizado com sucesso!');
     }
 }

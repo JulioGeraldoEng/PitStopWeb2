@@ -44,4 +44,8 @@ Route::middleware('auth')->group(function () {
         ->name('item-venda.destroy');
     Route::post('item-venda', [ItemVendaController::class, 'store'])
         ->name('item-venda.store');
+    Route::get('item-venda/{id}/edit', [ItemVendaController::class, 'edit'])
+        ->name('item-venda.edit');
+    Route::put('item-venda/{id}', [ItemVendaController::class, 'update'])
+        ->name('item-venda.update');
 });

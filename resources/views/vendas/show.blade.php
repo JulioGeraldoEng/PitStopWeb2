@@ -41,7 +41,7 @@
                         <th>Quantidade</th>
                         <th>Preço Unitário</th>
                         <th>Subtotal</th>
-                        <th width="80">Ações</th>
+                        <th width="120">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -52,7 +52,8 @@
                         <td>R$ {{ number_format($item->preco_unitario, 2, ',', '.') }}</td>
                         <td>R$ {{ number_format($item->subtotal, 2, ',', '.') }}</td>
                         <td>
-                            <form action="{{ route('item-venda.destroy', $item->id) }}" method="POST">
+                            <a href="{{ route('item-venda.edit', $item->id) }}" class="btn btn-sm btn-warning">Editar</a>
+                            <form action="{{ route('item-venda.destroy', $item->id) }}" method="POST" style="display:inline;">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Remover este item? O estoque será restaurado.')">Remover</button>
