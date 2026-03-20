@@ -127,4 +127,43 @@
         </div>
     </div>
 </div>
+
+<div class="row">
+    <!-- Card de Importação -->
+    <div class="col-md-12 mb-4">
+        <div class="card border-success">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">📤 Importar Backup</h5>
+            </div>
+            <div class="card-body">
+                <form action="{{ route('backups.import') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="row align-items-end">
+                        <div class="col-md-8">
+                            <label for="arquivo" class="form-label">Selecione um arquivo .sqlite, .sqlite3 ou .db</label>
+                            <input type="file" class="form-control" id="arquivo" name="arquivo" accept=".sqlite,.sqlite3,.db" required>
+                            <small class="text-muted">Máximo 10MB. O arquivo será copiado para a pasta de backups.</small>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-success w-100">📤 Importar Arquivo</button>
+                        </div>
+                    </div>
+                </form>
+                
+                @if(session('importado'))
+                    <div class="alert alert-warning mt-3 mb-0">
+                        <strong>Arquivo importado:</strong> {{ session('importado') }}
+                        <form action="{{ route('backups.restore-importado') }}" method="POST" style="display:inline;">
+                            @csrf
+                            <input type="hidden" name="filename" value="{{ session('importado') }}">
+                            <button type="submit" class="btn btn-sm btn-warning" onclick="return confirm('Restaurar este backup? O banco atual será substituído.')">
+                                🔄 Restaurar Agora
+                            </button>
+                        </form>
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+</div>
 @endsection

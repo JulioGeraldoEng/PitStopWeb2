@@ -63,6 +63,8 @@ Route::middleware('auth')->group(function () {
     Route::prefix('backups')->name('backups.')->group(function () {
         Route::get('/', [BackupController::class, 'index'])->name('index');
         Route::post('/create', [BackupController::class, 'create'])->name('create');
+        Route::post('/import', [BackupController::class, 'import'])->name('import');
+        Route::post('/restore-importado', [BackupController::class, 'restaurarImportado'])->name('restore-importado');
         Route::get('/download/{filename}', [BackupController::class, 'download'])->name('download');
         Route::post('/restore/{filename}', [BackupController::class, 'restore'])->name('restore');
         Route::delete('/destroy/{filename}', [BackupController::class, 'destroy'])->name('destroy');

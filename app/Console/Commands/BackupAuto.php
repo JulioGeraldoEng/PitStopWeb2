@@ -21,4 +21,70 @@ class BackupAuto extends Command
             $this->error("Erro ao criar backup: " . $e->getMessage());
         }
     }
+
+    // Importar backup via upload
+    public function import(Request $request)
+    {
+        $request->validate([
+            'arquivo' => 'required|file|mimes:sqlite,sqlite3,db|max:10240', // max 10MB
+        ]);
+        
+        try {
+            $arquivo = $request->file('arquivo');
+            
+            // Verificar extensão
+            $extensao = $arquivo->getClientOriginalExtension();
+            if (!in_array($extensao, ['sqlite', 'sqlite3', 'db'])) {
+                return redirect()->route('backups.index')
+                    ->with('error', 'Formato de arquivo inválido. Use .sqlite, .sqlite3 ou .db');
+            }
+            
+            // Nome do arquivo importado
+            $nomeImportado = 'importado_' . date('Ymd_His') . '.sqlite';
+            $importPath = storage_path('app/backups/' . $nomeImportado);
+            
+            // Mover arquivo para pasta de backups
+            $arquivo->move(storage_path('app/backups'), $nomeImportado);
+            
+            // Opção: perguntar se quer restaurar agora
+            $request->session()->put('ultimo_importado', $nomeImportado);
+            
+            return redirect()->route('backups.index')
+                ->with('success', 'Arquivo importado com sucesso! Nome: ' . $nomeImportado)
+                ->with('importado', $nomeImportado);
+                
+        } catch (\Exception $e) {
+            return redirect()->route('backups.index')
+                ->with('error', 'Erro ao importar: ' . $e->getMessage());
+        }
+    }
+
+    // Restaurar após importar
+    public function restaurarImportado(Request $request)
+    {
+        $filename = $request->filename;
+        $backupPath = storage_path('app/backups/' . $filename);
+        $bancoPath = database_path('pitstopweb.sqlite');
+        
+        if (!File::exists($backupPath)) {
+            return redirect()->route('backups.index')
+                ->with('error', 'Arquivo não encontrado!');
+        }
+        
+        try {
+            // Fazer backup do banco atual antes de restaurar
+            $this->criarBackup('auto_pre_restore_' . date('Ymd_His'));
+            
+            // Copiar backup importado para o banco atual
+            File::copy($backupPath, $bancoPath);
+            chmod($bancoPath, 0666);
+            
+            return redirect()->route('backups.index')
+                ->with('success', 'Backup importado restaurado com sucesso!');
+                
+        } catch (\Exception $e) {
+            return redirect()->route('backups.index')
+                ->with('error', 'Erro ao restaurar: ' . $e->getMessage());
+        }
+    }
 }
