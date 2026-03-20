@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Http\Controllers\BackupController;
+use Illuminate\Support\Facades\File;
 
 class BackupAuto extends Command
 {
@@ -23,31 +24,25 @@ class BackupAuto extends Command
     }
 
     // Importar backup via upload
+    // Importar backup via upload
     public function import(Request $request)
     {
-        $request->validate([
-            'arquivo' => 'required|file|mimes:sqlite,sqlite3,db|max:10240', // max 10MB
-        ]);
-        
         try {
-            $arquivo = $request->file('arquivo');
+            $request->validate([
+                'arquivo' => 'required|file|mimes:sqlite,sqlite3,db|max:10240',
+            ]);
             
-            // Verificar extensão
-            $extensao = $arquivo->getClientOriginalExtension();
-            if (!in_array($extensao, ['sqlite', 'sqlite3', 'db'])) {
-                return redirect()->route('backups.index')
-                    ->with('error', 'Formato de arquivo inválido. Use .sqlite, .sqlite3 ou .db');
+            $arquivo = $request->file('arquivo');
+            $nomeImportado = 'importado_' . date('Ymd_His') . '.sqlite';
+            
+            // Garantir que a pasta existe
+            $backupDir = storage_path('app/backups');
+            if (!File::exists($backupDir)) {
+                File::makeDirectory($backupDir, 0777, true);
             }
             
-            // Nome do arquivo importado
-            $nomeImportado = 'importado_' . date('Ymd_His') . '.sqlite';
-            $importPath = storage_path('app/backups/' . $nomeImportado);
-            
             // Mover arquivo para pasta de backups
-            $arquivo->move(storage_path('app/backups'), $nomeImportado);
-            
-            // Opção: perguntar se quer restaurar agora
-            $request->session()->put('ultimo_importado', $nomeImportado);
+            $arquivo->move($backupDir, $nomeImportado);
             
             return redirect()->route('backups.index')
                 ->with('success', 'Arquivo importado com sucesso! Nome: ' . $nomeImportado)
@@ -62,16 +57,16 @@ class BackupAuto extends Command
     // Restaurar após importar
     public function restaurarImportado(Request $request)
     {
-        $filename = $request->filename;
-        $backupPath = storage_path('app/backups/' . $filename);
-        $bancoPath = database_path('pitstopweb.sqlite');
-        
-        if (!File::exists($backupPath)) {
-            return redirect()->route('backups.index')
-                ->with('error', 'Arquivo não encontrado!');
-        }
-        
         try {
+            $filename = $request->filename;
+            $backupPath = storage_path('app/backups/' . $filename);
+            $bancoPath = database_path('pitstopweb.sqlite');
+            
+            if (!File::exists($backupPath)) {
+                return redirect()->route('backups.index')
+                    ->with('error', 'Arquivo não encontrado!');
+            }
+            
             // Fazer backup do banco atual antes de restaurar
             $this->criarBackup('auto_pre_restore_' . date('Ymd_His'));
             
