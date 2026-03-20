@@ -41,6 +41,9 @@ Route::middleware('auth')->group(function () {
     // Vendas
     Route::resource('vendas', VendaController::class);
 
+    // Recibo de venda
+    Route::get('vendas/{id}/recibo', [VendaController::class, 'recibo'])->name('vendas.recibo');
+
     // Dentro do middleware 'is_admin'
     Route::delete('item-venda/{id}', [ItemVendaController::class, 'destroy'])
         ->name('item-venda.destroy');

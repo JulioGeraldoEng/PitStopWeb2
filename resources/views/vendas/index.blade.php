@@ -46,6 +46,7 @@
                         </td>
                         <td>
                             <a href="{{ route('vendas.show', $venda->id) }}" class="btn btn-sm btn-info">Ver</a>
+                            <a href="{{ route('vendas.recibo', $venda->id) }}" class="btn btn-sm btn-info" target="_blank">🖨️</a>
                             <form action="{{ route('vendas.destroy', $venda->id) }}" method="POST" style="display:inline;">
                                 @csrf
                                 @method('DELETE')

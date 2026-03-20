@@ -6,7 +6,10 @@
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h3 class="mb-0">Venda #{{ $venda->id }}</h3>
-        <a href="{{ route('vendas.index') }}" class="btn btn-secondary">Voltar</a>
+        <div>
+            <a href="{{ route('vendas.recibo', $venda->id) }}" class="btn btn-primary" target="_blank">🖨️ Imprimir Recibo</a>
+            <a href="{{ route('vendas.index') }}" class="btn btn-secondary">Voltar</a>
+        </div>
     </div>
     <div class="card-body">
         <div class="row mb-4">

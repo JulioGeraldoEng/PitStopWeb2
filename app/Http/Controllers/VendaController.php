@@ -109,4 +109,10 @@ class VendaController extends Controller
         return redirect()->route('vendas.index')
             ->with('success', 'Venda cancelada e estoque restaurado!');
     }
+
+    public function recibo($id)
+    {
+        $venda = Venda::with(['cliente', 'itens.produto'])->findOrFail($id);
+        return view('vendas.recibo', compact('venda'));
+    }
 }
