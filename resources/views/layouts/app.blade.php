@@ -27,6 +27,9 @@
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ route('clientes.index') }}">📋 Clientes</a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('produtos.index') }}">🛍️ Produtos</a>
+                            </li>
                         @endif
                         <li class="nav-item">
                             <span class="nav-link">Olá, {{ Auth::user()->name }}</span>
