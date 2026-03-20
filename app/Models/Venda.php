@@ -17,21 +17,19 @@ class Venda extends Model
         'status',
     ];
 
-    // Relacionamento: uma venda pertence a um cliente
+    protected $casts = [
+        'data' => 'date',
+        'data_vencimento' => 'date',
+    ];
+
+    // Relacionamentos
     public function cliente()
     {
         return $this->belongsTo(Cliente::class);
     }
 
-    // Relacionamento: uma venda tem muitos itens
     public function itens()
     {
-        return $this->hasMany(ItemVenda::class, 'venda_id');
-    }
-
-    // Relacionamento: uma venda tem um recebimento
-    public function recebimento()
-    {
-        return $this->hasOne(Recebimento::class);
+        return $this->hasMany(ItemVenda::class);
     }
 }

@@ -6,6 +6,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\ProdutoController;
+use App\Http\Controllers\VendaController;
+use App\Http\Controllers\ItemVendaController;
 
 // Rotas públicas
 Route::get('/', function () {
@@ -33,4 +35,13 @@ Route::middleware('auth')->group(function () {
 
     // Produtos
     Route::resource('produtos', ProdutoController::class);
+
+    // Vendas
+    Route::resource('vendas', VendaController::class);
+
+    // Dentro do middleware 'is_admin'
+    Route::delete('item-venda/{id}', [ItemVendaController::class, 'destroy'])
+        ->name('item-venda.destroy');
+    Route::post('item-venda', [ItemVendaController::class, 'store'])
+        ->name('item-venda.store');
 });

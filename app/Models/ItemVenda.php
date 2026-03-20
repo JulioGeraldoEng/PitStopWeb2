@@ -9,7 +9,6 @@ class ItemVenda extends Model
 {
     use HasFactory;
 
-    // ← ADICIONAR ESTA LINHA
     protected $table = 'itens_venda';
 
     protected $fillable = [
@@ -21,13 +20,12 @@ class ItemVenda extends Model
         'subtotal',
     ];
 
-    // Relacionamento: item pertence a uma venda
+    // Relacionamentos
     public function venda()
     {
         return $this->belongsTo(Venda::class);
     }
 
-    // Relacionamento: item pertence a um produto
     public function produto()
     {
         return $this->belongsTo(Produto::class);

@@ -30,6 +30,9 @@
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ route('produtos.index') }}">🛍️ Produtos</a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('vendas.index') }}">💰 Vendas</a>
+                            </li>
                         @endif
                         <li class="nav-item">
                             <span class="nav-link">Olá, {{ Auth::user()->name }}</span>
@@ -69,5 +72,6 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    @stack('scripts')
 </body>
 </html>
