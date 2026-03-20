@@ -16,15 +16,18 @@ class DashboardController extends Controller
         $totalClientes = Cliente::count();
         $totalProdutos = Produto::count();
         
-        // Vendas de hoje
+        // Vendas de hoje (usando whereDate para comparar apenas a data)
         $hoje = Carbon::now()->format('Y-m-d');
-        $vendasHoje = Venda::where('data', $hoje)->count();
-        $faturamentoHoje = Venda::where('data', $hoje)->sum('total');
+        $vendasHoje = Venda::whereDate('data', $hoje)->count();
+        $faturamentoHoje = Venda::whereDate('data', $hoje)->sum('total');
         
-        // Vendas do mês
-        $mesAtual = Carbon::now()->format('Y-m');
-        $vendasMes = Venda::where('data', 'like', $mesAtual . '%')->count();
-        $faturamentoMes = Venda::where('data', 'like', $mesAtual . '%')->sum('total');
+        // Vendas do mês (usando whereMonth e whereYear)
+        $vendasMes = Venda::whereMonth('data', Carbon::now()->month)
+            ->whereYear('data', Carbon::now()->year)
+            ->count();
+        $faturamentoMes = Venda::whereMonth('data', Carbon::now()->month)
+            ->whereYear('data', Carbon::now()->year)
+            ->sum('total');
         
         // Produtos com estoque baixo (menos de 5)
         $estoqueBaixo = Produto::where('estoque', '<', 5)->count();
