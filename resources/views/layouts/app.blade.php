@@ -36,6 +36,9 @@
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ route('relatorios.index') }}">📊 Relatórios</a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('backups.index') }}">💾 Backup</a>
+                            </li>
                         @endif
                         <li class="nav-item">
                             <span class="nav-link">Olá, {{ Auth::user()->name }}</span>

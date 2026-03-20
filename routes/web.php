@@ -9,6 +9,7 @@ use App\Http\Controllers\ProdutoController;
 use App\Http\Controllers\VendaController;
 use App\Http\Controllers\ItemVendaController;
 use App\Http\Controllers\RelatorioController;
+use App\Http\Controllers\BackupController;
 
 // Rotas públicas
 Route::get('/', function () {
@@ -56,5 +57,14 @@ Route::middleware('auth')->group(function () {
         Route::post('/vendas-periodo', [RelatorioController::class, 'vendasPorPeriodo'])->name('vendas.periodo');
         Route::post('/produtos-ranking', [RelatorioController::class, 'produtosMaisVendidos'])->name('produtos.ranking');
         Route::get('/faturamento-mensal', [RelatorioController::class, 'faturamentoMensal'])->name('faturamento.mensal');
+    });
+
+    // Rotas de Backup
+    Route::prefix('backups')->name('backups.')->group(function () {
+        Route::get('/', [BackupController::class, 'index'])->name('index');
+        Route::post('/create', [BackupController::class, 'create'])->name('create');
+        Route::get('/download/{filename}', [BackupController::class, 'download'])->name('download');
+        Route::post('/restore/{filename}', [BackupController::class, 'restore'])->name('restore');
+        Route::delete('/destroy/{filename}', [BackupController::class, 'destroy'])->name('destroy');
     });
 });
