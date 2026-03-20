@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ClienteController;
+use App\Http\Controllers\Admin\UserController;
 
 // Rotas públicas
 Route::get('/', function () {
@@ -22,6 +24,8 @@ Route::middleware('auth')->group(function () {
     
     // Rotas apenas para ADMIN
     Route::middleware('is_admin')->prefix('admin')->name('admin.')->group(function () {
-        Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
+        Route::resource('users', UserController::class);
     });
+    // Rotas de Clientes (apenas admin)
+    Route::resource('clientes', ClienteController::class);
 });
